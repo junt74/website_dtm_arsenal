@@ -10,6 +10,10 @@ const JSONP_TIMEOUT_MS = 15_000;
 const ajv = new Ajv2020({ allErrors: true, strict: true });
 const validatePluginDatabase = ajv.compile<PluginDatabase>(pluginDatabaseSchema);
 
+interface JsonpCallbackRegistry {
+  [key: string]: unknown;
+}
+
 function assertPluginDatabase(data: unknown): PluginDatabase {
   if (!validatePluginDatabase(data)) {
     const detail = ajv.errorsText(validatePluginDatabase.errors, { separator: '; ' });
@@ -23,7 +27,7 @@ function loadPluginDatabaseJsonp(url: string): Promise<PluginDatabase> {
   return new Promise((resolve, reject) => {
     const callbackName = `__dtmArsenalJsonp_${Date.now()}_${Math.random().toString(36).slice(2)}`;
     const script = document.createElement('script');
-    const callbackRegistry = window as Window & Record<string, unknown>;
+    const callbackRegistry = window as unknown as JsonpCallbackRegistry;
 
     const timeoutId = window.setTimeout(() => {
       cleanup();
