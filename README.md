@@ -13,6 +13,7 @@ DTM所有プラグインを一覧・検索・フラッシュカードで確認�
 - Biome
 - 当面のデータ源: 同梱の `src/data/arsenal.json`（GAS取得は保留）
 - GitHub Pages
+- PWA（ホーム画面追加・オフライン利用）
 
 ## Development
 
@@ -40,6 +41,17 @@ https://junt74.github.io/website_dtm_arsenal/
 ```
 
 GitHubリポジトリ側では **Settings > Pages > Build and deployment > Source** を **GitHub Actions** に設定してください。
+
+## PWA
+
+本番ビルド後、対応ブラウザからホーム画面に追加できます。初回アクセスでアセットをキャッシュするため、2回目以降はオフラインでも一覧とフラッシュカードを利用できます。
+
+ローカルで確認する場合は、開発サーバーではなくプレビューを使ってください。
+
+```bash
+bun run build
+bun run preview
+```
 
 ## Initial scope
 
