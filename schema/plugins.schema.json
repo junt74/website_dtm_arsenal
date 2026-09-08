@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "plugins.schema.json",
+  "title": "DTM Plugin Database",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "generatedAt", "source", "plugins"],
+  "properties": {
+    "schemaVersion": { "const": "1.0.0" },
+    "generatedAt": { "type": "string" },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["spreadsheet", "sheet"],
+      "properties": {
+        "spreadsheet": { "type": "string" },
+        "sheet": { "type": "string" }
+      }
+    },
+    "plugins": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/plugin" }
+    }
+  },
+  "$defs": {
+    "plugin": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "developer", "productName", "mainCategory", "subCategory", "summary", "usage"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "developer": { "type": "string" },
+        "productName": { "type": "string", "minLength": 1 },
+        "mainCategory": { "type": "string" },
+        "subCategory": { "type": "string" },
+        "summary": { "type": "string" },
+        "usage": { "type": "string" }
+      }
+    }
+  }
+}
