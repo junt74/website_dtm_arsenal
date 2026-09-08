@@ -1,6 +1,7 @@
 import './styles/main.css';
 import { loadPluginDatabase } from './api/pluginApi';
 import type { Plugin } from './domain/Plugin';
+import { shuffleCopy } from './domain/shuffle';
 
 const appElement = document.querySelector<HTMLDivElement>('#app');
 if (!appElement) throw new Error('#app not found');
@@ -8,6 +9,7 @@ const app: HTMLDivElement = appElement;
 
 let plugins: Plugin[] = [];
 let filteredPlugins: Plugin[] = [];
+let flashcardPlugins: Plugin[] = [];
 let view: 'list' | 'flashcards' = 'list';
 let cardIndex = 0;
 let revealed = false;
@@ -52,7 +54,9 @@ function applyFilter(): void {
     return matchesQuery(plugin, normalized);
   });
 
-  cardIndex = Math.min(cardIndex, Math.max(filteredPlugins.length - 1, 0));
+  flashcardPlugins = shuffleCopy(filteredPlugins);
+  cardIndex = 0;
+  revealed = false;
 }
 
 function render(): void {
@@ -101,7 +105,12 @@ function render(): void {
 
   app.querySelectorAll<HTMLButtonElement>('[data-view]').forEach((button) => {
     button.addEventListener('click', () => {
-      view = button.dataset.view as 'list' | 'flashcards';
+      const nextView = button.dataset.view as 'list' | 'flashcards';
+      if (nextView === 'flashcards' && view !== 'flashcards') {
+        flashcardPlugins = shuffleCopy(filteredPlugins);
+        cardIndex = 0;
+      }
+      view = nextView;
       revealed = false;
       render();
     });
@@ -130,15 +139,15 @@ function render(): void {
   });
 
   app.querySelector<HTMLButtonElement>('[data-action="next"]')?.addEventListener('click', () => {
-    if (filteredPlugins.length === 0) return;
-    cardIndex = (cardIndex + 1) % filteredPlugins.length;
+    if (flashcardPlugins.length === 0) return;
+    cardIndex = (cardIndex + 1) % flashcardPlugins.length;
     revealed = false;
     render();
   });
 
   app.querySelector<HTMLButtonElement>('[data-action="previous"]')?.addEventListener('click', () => {
-    if (filteredPlugins.length === 0) return;
-    cardIndex = (cardIndex - 1 + filteredPlugins.length) % filteredPlugins.length;
+    if (flashcardPlugins.length === 0) return;
+    cardIndex = (cardIndex - 1 + flashcardPlugins.length) % flashcardPlugins.length;
     revealed = false;
     render();
   });
@@ -196,11 +205,11 @@ function renderList(): string {
 }
 
 function renderFlashcard(): string {
-  if (filteredPlugins.length === 0) {
+  if (flashcardPlugins.length === 0) {
     return '<section class="flashcard-section"><p class="status">出題できるプラグインがありません。</p></section>';
   }
 
-  const plugin = filteredPlugins[cardIndex];
+  const plugin = flashcardPlugins[cardIndex];
 
   return `
     <section class="flashcard-section">
@@ -212,7 +221,7 @@ function renderFlashcard(): string {
           placeholder="出題対象を検索で絞り込み"
           aria-label="フラッシュカード出題対象を検索"
         />
-        <span>${cardIndex + 1} / ${filteredPlugins.length}</span>
+        <span>${cardIndex + 1} / ${flashcardPlugins.length}</span>
       </div>
       <article class="flashcard">
         <p class="developer">${escapeHtml(plugin.developer)}</p>
