@@ -1,4 +1,4 @@
-import Ajv2020 from 'ajv/dist/2020';
+import Ajv2020 from 'ajv/dist/2020.js';
 import pluginDatabaseSchema from '../../schema/plugins.schema.json';
 import type { PluginDatabase } from '../domain/Plugin';
 
