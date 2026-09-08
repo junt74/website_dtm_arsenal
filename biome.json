@@ -1,5 +1,8 @@
 {
   "$schema": "https://biomejs.dev/schemas/2.2.4/schema.json",
+  "files": {
+    "includes": ["**", "!src/data/arsenal.json"]
+  },
   "formatter": { "enabled": true },
   "linter": { "enabled": true, "rules": { "recommended": true } },
   "javascript": { "formatter": { "quoteStyle": "single", "semicolons": "always" } }

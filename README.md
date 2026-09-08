@@ -11,7 +11,7 @@ DTM所有プラグインを一覧・検索・フラッシュカードで確認�
 - Ajv
 - Vitest
 - Biome
-- Google Apps Script（予定: Google SheetsからJSON配信）
+- 当面のデータ源: 同梱の `src/data/arsenal.json`（GAS取得は保留）
 - GitHub Pages
 
 ## Development
@@ -45,6 +45,7 @@ GitHubリポジトリ側では **Settings > Pages > Build and deployment > Sourc
 
 - 所有プラグイン一覧
 - フラッシュカード
+- 当面: 同梱JSONからの一括読み込み
 - 今後: GASからの一括JSON取得
 - 今後: 検索・カテゴリ絞り込み
 - 今後: 学習状態のLocalStorage保存
