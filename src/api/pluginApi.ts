@@ -3,7 +3,7 @@ import pluginDatabaseSchema from '../../schema/plugins.schema.json';
 import type { PluginDatabase } from '../domain/Plugin';
 
 const DEFAULT_PLUGIN_API_URL =
-  'https://script.google.com/macros/s/AKfycbw5XVbE6rm2tXiNAzxTNXZHeXJgChMbm3pY2WBBlDdHoMO0zgp_R9af3qf40MdxAbIy/exec';
+  'https://script.google.com/macros/s/AKfycbzbqd6iZPblh6e0-pm_WzhgyVVTLQhyyc9pjK-E7rwn8vSfkFNwLnv0NH8d8LGx9LIJ/exec';
 
 const JSONP_TIMEOUT_MS = 15_000;
 
