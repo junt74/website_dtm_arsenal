@@ -8,7 +8,7 @@
 
 * { box-sizing: border-box; }
 body { margin: 0; min-width: 320px; min-height: 100vh; background: #0d1117; }
-button, input { font: inherit; }
+button, input, select { font: inherit; }
 button { cursor: pointer; }
 
 .app-shell { width: min(1040px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 64px; }
@@ -19,7 +19,10 @@ h1 { margin: 0; font-size: clamp(2rem, 6vw, 4rem); letter-spacing: -.04em; }
 .tab, .flashcard-actions button, .error-panel button { border: 1px solid #30363d; background: #161b22; color: inherit; border-radius: 10px; padding: 10px 14px; }
 .tab.is-active { background: #f0f6fc; color: #0d1117; border-color: #f0f6fc; }
 .toolbar { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 18px; color: #8b949e; }
-.toolbar input { flex: 1; max-width: 680px; border: 1px solid #30363d; background: #161b22; color: inherit; border-radius: 10px; padding: 12px 14px; }
+.toolbar-filters { display: flex; flex: 1; align-items: center; gap: 12px; min-width: 0; }
+.toolbar input, .toolbar select { border: 1px solid #30363d; background: #161b22; color: inherit; border-radius: 10px; padding: 12px 14px; }
+.toolbar input { flex: 1; min-width: 0; }
+.toolbar select { flex: 0 1 240px; max-width: 280px; }
 .plugin-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
 .plugin-card, .flashcard, .error-panel { border: 1px solid #30363d; background: #161b22; border-radius: 18px; padding: 22px; }
 .plugin-card h2, .flashcard h2 { margin: 6px 0 12px; }
@@ -45,6 +48,7 @@ h1 { margin: 0; font-size: clamp(2rem, 6vw, 4rem); letter-spacing: -.04em; }
   .tabs { width: 100%; }
   .tab { flex: 1; }
   .toolbar { align-items: stretch; flex-direction: column; }
-  .toolbar input { max-width: none; }
+  .toolbar-filters { flex-direction: column; align-items: stretch; }
+  .toolbar input, .toolbar select { max-width: none; flex: none; }
   .flashcard-actions { flex-wrap: wrap; }
 }

@@ -12,6 +12,7 @@ let view: 'list' | 'flashcards' = 'list';
 let cardIndex = 0;
 let revealed = false;
 let query = '';
+let selectedDeveloper = '';
 let loading = true;
 let loadError: string | null = null;
 
@@ -24,21 +25,32 @@ function escapeHtml(value: string): string {
     .replaceAll("'", '&#039;');
 }
 
+function listDevelopers(): string[] {
+  return [...new Set(plugins.map((plugin) => plugin.developer).filter(Boolean))].sort((a, b) =>
+    a.localeCompare(b, 'ja'),
+  );
+}
+
+function matchesQuery(plugin: Plugin, normalized: string): boolean {
+  if (!normalized) return true;
+
+  return [
+    plugin.productName,
+    plugin.developer,
+    plugin.mainCategory,
+    plugin.subCategory,
+    plugin.summary,
+    plugin.usage,
+  ].some((value) => value.toLocaleLowerCase('ja-JP').includes(normalized));
+}
+
 function applyFilter(): void {
   const normalized = query.trim().toLocaleLowerCase('ja-JP');
 
-  filteredPlugins = normalized
-    ? plugins.filter((plugin) =>
-        [
-          plugin.productName,
-          plugin.developer,
-          plugin.mainCategory,
-          plugin.subCategory,
-          plugin.summary,
-          plugin.usage,
-        ].some((value) => value.toLocaleLowerCase('ja-JP').includes(normalized)),
-      )
-    : [...plugins];
+  filteredPlugins = plugins.filter((plugin) => {
+    if (selectedDeveloper && plugin.developer !== selectedDeveloper) return false;
+    return matchesQuery(plugin, normalized);
+  });
 
   cardIndex = Math.min(cardIndex, Math.max(filteredPlugins.length - 1, 0));
 }
@@ -105,6 +117,13 @@ function render(): void {
     nextInput?.setSelectionRange(query.length, query.length);
   });
 
+  const developerSelect = app.querySelector<HTMLSelectElement>('[data-developer]');
+  developerSelect?.addEventListener('change', () => {
+    selectedDeveloper = developerSelect.value;
+    applyFilter();
+    render();
+  });
+
   app.querySelector<HTMLButtonElement>('[data-action="reveal"]')?.addEventListener('click', () => {
     revealed = !revealed;
     render();
@@ -125,17 +144,32 @@ function render(): void {
   });
 }
 
+function renderDeveloperOptions(): string {
+  return listDevelopers()
+    .map((developer) => {
+      const selected = developer === selectedDeveloper ? ' selected' : '';
+      return `<option value="${escapeHtml(developer)}"${selected}>${escapeHtml(developer)}</option>`;
+    })
+    .join('');
+}
+
 function renderList(): string {
   return `
     <section>
       <div class="toolbar">
-        <input
-          data-search
-          type="search"
-          value="${escapeHtml(query)}"
-          placeholder="製品名、メーカー、カテゴリ、概要、使い方から検索"
-          aria-label="プラグインを検索"
-        />
+        <div class="toolbar-filters">
+          <input
+            data-search
+            type="search"
+            value="${escapeHtml(query)}"
+            placeholder="製品名、メーカー、カテゴリ、概要、使い方から検索"
+            aria-label="プラグインを検索"
+          />
+          <select data-developer aria-label="メーカーで絞り込み">
+            <option value=""${selectedDeveloper === '' ? ' selected' : ''}>すべてのメーカー</option>
+            ${renderDeveloperOptions()}
+          </select>
+        </div>
         <span>${filteredPlugins.length} / ${plugins.length} plugins</span>
       </div>
       ${
