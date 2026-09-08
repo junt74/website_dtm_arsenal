@@ -1,11 +1,11 @@
-import Ajv from 'ajv';
+import Ajv2020 from 'ajv/dist/2020';
 import pluginDatabaseSchema from '../../schema/plugins.schema.json';
 import type { PluginDatabase } from '../domain/Plugin';
 
 const DEFAULT_PLUGIN_API_URL =
   'https://script.google.com/macros/s/AKfycbw5XVbE6rm2tXiNAzxTNXZHeXJgChMbm3pY2WBBlDdHoMO0zgp_R9af3qf40MdxAbIy/exec';
 
-const ajv = new Ajv({ allErrors: true, strict: true });
+const ajv = new Ajv2020({ allErrors: true, strict: true });
 const validatePluginDatabase = ajv.compile<PluginDatabase>(pluginDatabaseSchema);
 
 export async function loadPluginDatabase(): Promise<PluginDatabase> {
