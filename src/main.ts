@@ -2,8 +2,9 @@ import './styles/main.css';
 import { loadPluginDatabase } from './api/pluginApi';
 import type { Plugin } from './domain/Plugin';
 
-const app = document.querySelector<HTMLDivElement>('#app');
-if (!app) throw new Error('#app not found');
+const appElement = document.querySelector<HTMLDivElement>('#app');
+if (!appElement) throw new Error('#app not found');
+const app: HTMLDivElement = appElement;
 
 let plugins: Plugin[] = [];
 let filteredPlugins: Plugin[] = [];
