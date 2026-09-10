@@ -1,1 +1,1 @@
-{"root":["./src/main.test.ts","./src/main.ts","./src/vite-env.d.ts","./src/api/pluginapi.ts","./src/domain/plugin.ts"],"version":"5.9.3"}
+{"root":["./src/main.test.ts","./src/main.ts","./src/vite-env.d.ts","./src/api/pluginapi.ts","./src/domain/plugin.ts","./src/domain/shuffle.test.ts","./src/domain/shuffle.ts"],"version":"5.9.3"}
