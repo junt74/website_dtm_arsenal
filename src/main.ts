@@ -15,6 +15,7 @@ let cardIndex = 0;
 let revealed = false;
 let query = '';
 let selectedDeveloper = '';
+let selectedSubCategory = '';
 let loading = true;
 let loadError: string | null = null;
 
@@ -30,6 +31,12 @@ function escapeHtml(value: string): string {
 function listDevelopers(): string[] {
 	return [
 		...new Set(plugins.map((plugin) => plugin.developer).filter(Boolean)),
+	].sort((a, b) => a.localeCompare(b, 'ja'));
+}
+
+function listSubCategories(): string[] {
+	return [
+		...new Set(plugins.map((plugin) => plugin.subCategory).filter(Boolean)),
 	].sort((a, b) => a.localeCompare(b, 'ja'));
 }
 
@@ -50,8 +57,8 @@ function applyFilter(): void {
 	const normalized = query.trim().toLocaleLowerCase('ja-JP');
 
 	filteredPlugins = plugins.filter((plugin) => {
-		if (selectedDeveloper && plugin.developer !== selectedDeveloper)
-			return false;
+		if (selectedDeveloper && plugin.developer !== selectedDeveloper) return false;
+		if (selectedSubCategory && plugin.subCategory !== selectedSubCategory) return false;
 		return matchesQuery(plugin, normalized);
 	});
 
@@ -82,11 +89,9 @@ function render(): void {
         </section>
       </main>
     `;
-		app
-			.querySelector<HTMLButtonElement>('[data-action="retry"]')
-			?.addEventListener('click', () => {
-				void bootstrap();
-			});
+		app.querySelector<HTMLButtonElement>('[data-action="retry"]')?.addEventListener('click', () => {
+			void bootstrap();
+		});
 		return;
 	}
 
@@ -129,17 +134,21 @@ function render(): void {
 		nextInput?.setSelectionRange(query.length, query.length);
 	});
 
-	const developerSelect =
-		app.querySelector<HTMLSelectElement>('[data-developer]');
+	const developerSelect = app.querySelector<HTMLSelectElement>('[data-developer]');
 	developerSelect?.addEventListener('change', () => {
 		selectedDeveloper = developerSelect.value;
 		applyFilter();
 		render();
 	});
 
-	const flashcard = app.querySelector<HTMLElement>(
-		'[data-action="advance-card"]',
-	);
+	const subCategorySelect = app.querySelector<HTMLSelectElement>('[data-subcategory]');
+	subCategorySelect?.addEventListener('change', () => {
+		selectedSubCategory = subCategorySelect.value;
+		applyFilter();
+		render();
+	});
+
+	const flashcard = app.querySelector<HTMLElement>('[data-action="advance-card"]');
 	const advanceFlashcard = (): void => {
 		if (!revealed) {
 			revealed = true;
@@ -167,6 +176,15 @@ function renderDeveloperOptions(): string {
 		.join('');
 }
 
+function renderSubCategoryOptions(): string {
+	return listSubCategories()
+		.map((subCategory) => {
+			const selected = subCategory === selectedSubCategory ? ' selected' : '';
+			return `<option value="${escapeHtml(subCategory)}"${selected}>${escapeHtml(subCategory)}</option>`;
+		})
+		.join('');
+}
+
 function renderList(): string {
 	return `
     <section>
@@ -183,16 +201,20 @@ function renderList(): string {
             <option value=""${selectedDeveloper === '' ? ' selected' : ''}>すべてのメーカー</option>
             ${renderDeveloperOptions()}
           </select>
+          <select data-subcategory aria-label="SubCategoryで絞り込み">
+            <option value=""${selectedSubCategory === '' ? ' selected' : ''}>すべてのSubCategory</option>
+            ${renderSubCategoryOptions()}
+          </select>
         </div>
         <span>${filteredPlugins.length} / ${plugins.length} plugins</span>
       </div>
       ${
-				filteredPlugins.length === 0
-					? '<p class="status">該当するプラグインはありません。</p>'
-					: `<div class="plugin-grid">
+			filteredPlugins.length === 0
+				? '<p class="status">該当するプラグインはありません。</p>'
+				: `<div class="plugin-grid">
               ${filteredPlugins
-								.map(
-									(plugin) => `
+					.map(
+						(plugin) => `
                     <article class="plugin-card">
                       <p class="developer">${escapeHtml(plugin.developer)}</p>
                       <h2>${escapeHtml(plugin.productName)}</h2>
@@ -201,10 +223,10 @@ function renderList(): string {
                       ${plugin.usage ? `<p class="usage">${escapeHtml(plugin.usage)}</p>` : ''}
                     </article>
                   `,
-								)
-								.join('')}
+					)
+					.join('')}
             </div>`
-			}
+		}
     </section>
   `;
 }
@@ -238,14 +260,14 @@ function renderFlashcard(): string {
         <p class="developer">${escapeHtml(plugin.developer)}</p>
         <h2>${escapeHtml(plugin.productName)}</h2>
         ${
-					revealed
-						? `<div class="answer">
+			revealed
+				? `<div class="answer">
                 <p class="category">${escapeHtml(plugin.mainCategory)} / ${escapeHtml(plugin.subCategory)}</p>
                 <p>${escapeHtml(plugin.summary)}</p>
                 ${plugin.usage ? `<p class="usage">${escapeHtml(plugin.usage)}</p>` : ''}
               </div>`
-						: '<p class="prompt">これは何をするプラグイン？</p>'
-				}
+				: '<p class="prompt">これは何をするプラグイン？</p>'
+		}
         <p class="flashcard-hint">${revealed ? '押すと次の問題へ' : '押すと答えを表示'}</p>
       </article>
     </section>
