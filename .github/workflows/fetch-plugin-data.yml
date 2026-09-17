@@ -1,0 +1,45 @@
+name: Refresh plugin JSON
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  refresh-json:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download plugin JSON
+        env:
+          JSON_URL: ${{ secrets.JSON_URL }}
+        run: |
+          set -euo pipefail
+          test -n "$JSON_URL" || { echo "JSON_URL secret is not configured" >&2; exit 1; }
+          mkdir -p src/data
+          curl --fail --location --silent --show-error \
+            --retry 3 --retry-delay 2 \
+            "$JSON_URL" \
+            --output src/data/arsenal.json.tmp
+
+      - name: Validate JSON
+        run: |
+          python3 -m json.tool src/data/arsenal.json.tmp > /dev/null
+          mv src/data/arsenal.json.tmp src/data/arsenal.json
+
+      - name: Commit refreshed JSON
+        run: |
+          if git diff --quiet -- src/data/arsenal.json; then
+            echo "Plugin JSON is already up to date."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/data/arsenal.json
+          git commit -m "Refresh plugin JSON"
+          git push
