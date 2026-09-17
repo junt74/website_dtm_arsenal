@@ -35,14 +35,15 @@ jobs:
 
       - name: Commit refreshed JSON
         run: |
-          if git diff --quiet -- public/data/arsenal.json; then
+          git add public/data/arsenal.json
+
+          if git diff --cached --quiet; then
             echo "Plugin JSON is already up to date."
             exit 0
           fi
 
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add public/data/arsenal.json
           git commit -m "Refresh plugin JSON"
 
           git fetch origin main
