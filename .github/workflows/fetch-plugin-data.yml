@@ -41,6 +41,19 @@ jobs:
 
       - name: Commit refreshed JSON
         run: |
+          set -euo pipefail
+
+          # Keep the freshly downloaded JSON outside the worktree.
+          cp public/data/arsenal.json /tmp/arsenal.json
+
+          # Move the worktree to the latest main.
+          git fetch origin main
+          git reset --hard origin/main
+
+          # Restore the freshly downloaded JSON on top of latest main.
+          mkdir -p public/data
+          cp /tmp/arsenal.json public/data/arsenal.json
+
           git add public/data/arsenal.json
 
           if git diff --cached --quiet; then
@@ -49,9 +62,6 @@ jobs:
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
             git commit -m "Refresh plugin JSON"
-
-            git fetch origin main
-            git rebase origin/main
             git push origin HEAD:main
           fi
 
